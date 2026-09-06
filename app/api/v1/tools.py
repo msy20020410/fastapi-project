@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Form, File, UploadFile, HTTPException, Request, Depends, Cookie, Header
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
@@ -17,6 +18,13 @@ async def read_users():
 # @router.get("/tokenAndKeyVerify/", dependencies=[Depends(verify_token), Depends(verify_key)])
 # async def read_items():
 #     return [{"item": "Foo"}, {"item": "Bar"}]
+
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+#
+#
+# @router.get("/items/")
+# async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
+#     return {"token": token}
 
 
 @router.get("/unicorns/{name}")
