@@ -15,5 +15,9 @@ class Settings(BaseSettings):
     version: str = "0.1.0"
     api_v1_prefix: str = "/api/v1"
 
+    # 数据库配置
+    database_url: str = "sqlite:///./database.db"
+    echo_sql: bool = True
+
 
 settings = Settings()
