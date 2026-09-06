@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.schemas.exception import UnicornException
-from fastapi.security import OAuth2PasswordBearer
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.version,
