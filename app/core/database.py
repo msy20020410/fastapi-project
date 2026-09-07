@@ -1,4 +1,7 @@
 """数据库连接和会话管理。"""
+from typing import Annotated
+
+from fastapi import Depends
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import settings
@@ -20,3 +23,7 @@ def get_session():
     """获取数据库会话的依赖注入函数。"""
     with Session(engine) as session:
         yield session
+
+
+# 定义 Session 依赖类型
+SessionDep = Annotated[Session, Depends(get_session)]

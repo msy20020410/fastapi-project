@@ -1,36 +1,36 @@
 """Hero 相关的 API 端点。"""
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from typing import Annotated
 
-from app.core.database import get_session
-from app.schemas.hero import Hero
+from fastapi import APIRouter, HTTPException, Query
+from sqlmodel import select
+
+from app.core.database import SessionDep
+from app.schemas.hero import Hero, HeroPublic, HeroCreate
 
 router = APIRouter(prefix="/heroes", tags=["Heroes"])
 
 
-@router.post("", response_model=Hero)
-def create_hero(hero: Hero, session: Session = Depends(get_session)):
-    """创建新的 Hero。"""
-    session.add(hero)
+@router.post("/heroes/", response_model=HeroPublic)
+def create_hero(hero: HeroCreate, session: SessionDep):
+    db_hero = Hero.model_validate(hero)
+    session.add(db_hero)
     session.commit()
-    session.refresh(hero)
-    return hero
+    session.refresh(db_hero)
+    return db_hero
 
 
-@router.get("", response_model=list[Hero])
+@router.get("/heroes/", response_model=list[HeroPublic])
 def read_heroes(
+        session: SessionDep,
         offset: int = 0,
-        limit: int = 100,
-        session: Session = Depends(get_session)
+        limit: Annotated[int, Query(le=100)] = 100,
 ):
-    """获取 Hero 列表。"""
     heroes = session.exec(select(Hero).offset(offset).limit(limit)).all()
     return heroes
 
 
-@router.get("/{hero_id}", response_model=Hero)
-def read_hero(hero_id: int, session: Session = Depends(get_session)):
-    """根据 ID 获取 Hero。"""
+@router.get("/heroes/{hero_id}", response_model=HeroPublic)
+def read_hero(hero_id: int, session: SessionDep):
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(status_code=404, detail="Hero not found")
@@ -41,7 +41,7 @@ def read_hero(hero_id: int, session: Session = Depends(get_session)):
 def update_hero(
         hero_id: int,
         hero_data: Hero,
-        session: Session = Depends(get_session)
+        session: SessionDep
 ):
     """更新 Hero 信息。"""
     hero = session.get(Hero, hero_id)
@@ -59,7 +59,7 @@ def update_hero(
 
 
 @router.delete("/{hero_id}")
-def delete_hero(hero_id: int, session: Session = Depends(get_session)):
+def delete_hero(hero_id: int, session: SessionDep):
     """删除 Hero。"""
     hero = session.get(Hero, hero_id)
     if not hero:
