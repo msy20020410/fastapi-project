@@ -8,7 +8,7 @@ from app.schemas.image import Image
 class Item(BaseModel):
     name: str
     description: str | None = None
-    price: float
+    price: float| None = None
     tax: float | None = None
 
 
